@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prototipe Asesmen Peta Bakat Siswa</title>
+<style>
+  :root{
+    --ink:#16324F;
+    --ink-soft:#3C5977;
+    --paper:#F4F6FA;
+    --paper-card:#FFFFFF;
+    --gold:#B98900;
+    --gold-soft:#F0E0AE;
+    --teal:#1F7A6C;
+    --teal-soft:#D9EEE9;
+    --border:#DCE2EC;
+    --tier1:#B98900;
+    --tier2:#D8A93B;
+    --tier3:#A9B4C4;
+    --tier4:#DDE2EA;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Segoe UI', system-ui, -apple-system, sans-serif;
+    line-height:1.5;
+  }
+  h1,h2,h3{
+    font-family:Georgia,'Times New Roman',serif;
+    font-weight:600;
+    margin:0 0 .3em 0;
+    color:var(--ink);
+  }
+  .wrap{max-width:880px;margin:0 auto;padding:32px 20px 80px;}
+
+  /* header */
+  .masthead{
+    display:flex;justify-content:space-between;align-items:flex-end;
+    border-bottom:2px solid var(--ink);
+    padding-bottom:14px;margin-bottom:28px;
+  }
+  .masthead .eyebrow{
+    font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--gold);font-weight:700;
+  }
+  .masthead h1{font-size:26px;}
+  .masthead .badge{
+    font-size:11px;background:var(--ink);color:#fff;padding:5px 10px;
+    border-radius:2px;letter-spacing:.05em;white-space:nowrap;
+  }
+
+  .card{
+    background:var(--paper-card);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:24px 26px;
+    margin-bottom:20px;
+  }
+
+  /* intro screen */
+  .intro p{margin:0 0 12px;}
+  .intro ul{margin:0 0 16px;padding-left:20px;}
+  .intro li{margin-bottom:6px;}
+  .start-btn, .nav-btn, .restart-btn{
+    background:var(--ink);color:#fff;border:none;padding:12px 22px;
+    font-size:15px;border-radius:3px;cursor:pointer;font-family:inherit;
+    transition:background .15s ease;
+  }
+  .start-btn:hover, .nav-btn:hover, .restart-btn:hover{background:var(--ink-soft);}
+  .nav-btn:disabled{background:#B7C1CF;cursor:not-allowed;}
+
+  /* progress */
+  .progress-track{
+    height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:22px;
+  }
+  .progress-fill{height:100%;background:var(--gold);transition:width .2s ease;}
+  .progress-label{font-size:12px;color:var(--ink-soft);margin-bottom:6px;letter-spacing:.03em;}
+
+  /* quiz */
+  .q-number{
+    font-size:12px;color:var(--gold);font-weight:700;letter-spacing:.08em;margin-bottom:8px;
+  }
+  .q-text{font-size:19px;margin-bottom:20px;line-height:1.4;}
+  .scale{display:flex;gap:8px;flex-wrap:wrap;}
+  .scale button{
+    flex:1;min-width:90px;
+    padding:12px 6px;border:1px solid var(--border);background:#fff;
+    border-radius:4px;cursor:pointer;font-size:13px;color:var(--ink-soft);
+    font-family:inherit;transition:all .12s ease;
+  }
+  .scale button:hover{border-color:var(--gold);}
+  .scale button.selected{
+    background:var(--ink);color:#fff;border-color:var(--ink);font-weight:600;
+  }
+  .quiz-nav{display:flex;justify-content:space-between;margin-top:24px;}
+
+  /* results */
+  .section-label{
+    font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);
+    font-weight:700;margin-bottom:6px;
+  }
+  .section-title{font-size:22px;margin-bottom:14px;}
+
+  /* 1. urutan bakat */
+  .rank-row{
+    display:flex;align-items:center;gap:12px;padding:8px 0;
+    border-bottom:1px solid var(--border);
+  }
+  .rank-row:last-child{border-bottom:none;}
+  .rank-num{
+    width:26px;height:26px;border-radius:50%;background:var(--ink);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;
+    flex-shrink:0;
+  }
+  .rank-row.tier1 .rank-num{background:var(--tier1);}
+  .rank-row.tier2 .rank-num{background:var(--tier2);}
+  .rank-row.tier3 .rank-num{background:var(--tier3);color:var(--ink);}
+  .rank-row.tier4 .rank-num{background:var(--tier4);color:var(--ink-soft);}
+  .rank-name{width:150px;font-weight:600;font-size:14px;flex-shrink:0;}
+  .rank-bar-track{flex:1;height:10px;background:var(--border);border-radius:5px;overflow:hidden;}
+  .rank-bar-fill{height:100%;background:var(--ink);}
+  .rank-row.tier1 .rank-bar-fill{background:var(--tier1);}
+  .rank-row.tier2 .rank-bar-fill{background:var(--tier2);}
+  .rank-row.tier3 .rank-bar-fill{background:var(--tier3);}
+  .rank-row.tier4 .rank-bar-fill{background:var(--tier4);}
+  .rank-group{font-size:11px;color:var(--ink-soft);width:70px;text-align:right;flex-shrink:0;}
+
+  .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;font-size:12px;color:var(--ink-soft);}
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .legend i{width:10px;height:10px;border-radius:50%;display:inline-block;}
+
+  /* 2. peta bakat - quadrant compass */
+  .compass{
+    display:grid;grid-template-columns:1fr 1fr;gap:16px;
+  }
+  .quad{
+    border:1px solid var(--border);border-radius:6px;padding:16px;
+    background:#FBFCFE;
+  }
+  .quad h3{font-size:14px;letter-spacing:.05em;text-transform:uppercase;margin-bottom:10px;
+    padding-bottom:8px;border-bottom:2px solid var(--gold-soft);}
+  .quad-theme{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:6px 8px;border-radius:3px;margin-bottom:5px;font-size:13px;
+  }
+  .quad-theme .dot{width:8px;height:8px;border-radius:50%;margin-right:8px;flex-shrink:0;}
+  .quad-theme-name{display:flex;align-items:center;}
+
+  /* 3. fungsi */
+  .func-item{
+    display:flex;gap:14px;padding:12px 0;border-bottom:1px solid var(--border);
+    align-items:flex-start;
+  }
+  .func-item:last-child{border-bottom:none;}
+  .func-rank{
+    font-family:Georgia,serif;font-size:20px;color:var(--gold);font-weight:700;
+    width:28px;flex-shrink:0;
+  }
+  .func-body h4{margin:0 0 4px;font-size:15px;}
+  .func-body p{margin:0;font-size:13px;color:var(--ink-soft);}
+
+  /* 4. cluster map */
+  .cluster-row{margin-bottom:14px;}
+  .cluster-head{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;}
+  .cluster-head strong{font-size:14px;}
+  .cluster-track{height:16px;background:var(--border);border-radius:8px;overflow:hidden;}
+  .cluster-fill{height:100%;border-radius:8px;}
+
+  /* 5. typology */
+  .typo-card{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:14px 16px;border:1px solid var(--border);border-radius:6px;margin-bottom:10px;
+    background:#FBFCFE;
+  }
+  .typo-card.top .typo-rank{background:var(--gold);color:#fff;}
+  .typo-name{font-weight:700;font-size:15px;}
+  .typo-desc{font-size:13px;color:var(--ink-soft);margin-top:3px;}
+  .typo-rank{
+    width:32px;height:32px;border-radius:50%;background:var(--teal-soft);color:var(--teal);
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;
+    flex-shrink:0;
+  }
+
+  .footnote{
+    font-size:12px;color:var(--ink-soft);margin-top:28px;border-top:1px dashed var(--border);
+    padding-top:14px;
+  }
+
+  .hidden{display:none;}
+
+  /* student info + export bar */
+  .student-info{
+    display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:6px;
+  }
+  .student-info label{font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);display:block;margin-bottom:4px;}
+  .student-info input{
+    width:100%;padding:9px 10px;border:1px solid var(--border);border-radius:4px;
+    font-family:inherit;font-size:14px;color:var(--ink);
+  }
+  .export-bar{
+    display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
+    margin-bottom:20px;
+  }
+  .export-btn{
+    background:var(--teal);color:#fff;border:none;padding:11px 20px;font-size:14px;
+    border-radius:3px;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:8px;
+  }
+  .export-btn:hover{background:#175e53;}
+  .report-only{display:none;}
+
+  /* PRINT / PDF LAYOUT */
+  @media print{
+    body{background:#fff;}
+    .masthead .badge, .export-bar, .restart-btn, #screen-intro, #screen-quiz{display:none !important;}
+    .wrap{max-width:100%;padding:0;}
+    .card{
+      border:none;border-bottom:1px solid #ccc;border-radius:0;
+      padding:14px 0;margin-bottom:0;page-break-inside:avoid;
+    }
+    .masthead{margin-bottom:14px;}
+    .report-only{display:block;}
+    .footnote{page-break-inside:avoid;}
+    a[href]:after{content:"";}
+  }
+
+  @media (max-width:600px){
+    .compass{grid-template-columns:1fr;}
+    .rank-name{width:100px;font-size:12px;}
+    .scale button{min-width:60px;font-size:11px;padding:10px 4px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="masthead">
+    <div>
+      <div class="eyebrow">Prototipe · SMA Avicenna Jagakarsa</div>
+      <h1>Asesmen Peta Bakat Siswa</h1>
+    </div>
+    <div class="badge">Versi Uji Coba</div>
+  </div>
+  <div class="report-only" id="report-student-line" style="font-size:14px;margin:-18px 0 24px;color:var(--ink-soft);"></div>
+
+  <!-- INTRO -->
+  <div id="screen-intro" class="card intro">
+    <h2>Sebelum memulai</h2>
+    <p>Asesmen ini membantu memetakan kecenderungan bakat alami kamu melalui 48 pernyataan singkat. Tidak ada jawaban benar atau salah — jawablah sesuai dengan dirimu apa adanya.</p>
+    <ul>
+      <li>Waktu pengerjaan sekitar 12–15 menit.</li>
+      <li>Setiap pernyataan dinilai dengan skala 1 (Sangat Tidak Sesuai) sampai 5 (Sangat Sesuai).</li>
+      <li>Hasil akan menampilkan: Urutan Bakat, Peta Bakat, Fungsi yang Sesuai, Peta Kekuatan (Cluster Map), dan Tipologi Kekuatan.</li>
+    </ul>
+    <button class="start-btn" onclick="startQuiz()">Mulai Asesmen</button>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="screen-quiz" class="card hidden">
+    <div class="progress-label" id="progress-label">Pertanyaan 1 dari 48</div>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    <div class="q-number" id="q-number">ITEM 01</div>
+    <div class="q-text" id="q-text">...</div>
+    <div class="scale" id="scale-buttons"></div>
+    <div class="quiz-nav">
+      <button class="nav-btn" id="btn-prev" onclick="prevQ()">← Sebelumnya</button>
+      <button class="nav-btn" id="btn-next" onclick="nextQ()" disabled>Selanjutnya →</button>
+    </div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="screen-results" class="hidden">
+
+    <div class="card">
+      <div class="section-label">Identitas Siswa</div>
+      <div class="student-info">
+        <div>
+          <label for="stu-name">Nama Siswa</label>
+          <input type="text" id="stu-name" placeholder="Tulis nama lengkap">
+        </div>
+        <div>
+          <label for="stu-class">Kelas / Jurusan</label>
+          <input type="text" id="stu-class" placeholder="Contoh: XI IPA 2">
+        </div>
+      </div>
+      <div class="report-only" style="font-size:12px;color:var(--ink-soft);margin-top:4px;">
+        Tanggal cetak: <span id="print-date"></span>
+      </div>
+    </div>
+
+    <div class="export-bar">
+      <div style="font-size:13px;color:var(--ink-soft);">Laporan siap diunduh setelah nama diisi.</div>
+      <button class="export-btn" onclick="exportReport()">⬇ Unduh / Cetak Laporan PDF</button>
+    </div>
+
+    <div class="card">
+      <div class="section-label">01 — Hasil Asesmen</div>
+      <div class="section-title">Urutan Bakat</div>
+      <p style="font-size:13px;color:var(--ink-soft);margin-top:-6px;">7 bakat teratas adalah bakat dominan (potensi kekuatan utama). Bakat pada urutan terbawah menandakan area yang tidak dominan.</p>
+      <div id="rank-list"></div>
+      <div class="legend">
+        <span><i style="background:var(--tier1)"></i>Urutan 1–4 (dominan)</span>
+        <span><i style="background:var(--tier2)"></i>Urutan 5–8</span>
+        <span><i style="background:var(--tier3)"></i>Urutan 9–12</span>
+        <span><i style="background:var(--tier4)"></i>Urutan 13–16</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-label">02</div>
+      <div class="section-title">Peta Bakat</div>
+      <p style="font-size:13px;color:var(--ink-soft);margin-top:-6px;">Ke-16 bakat dikelompokkan dalam 4 klaster: Striving (daya juang), Thinking (cara berpikir), Relating (cara membangun hubungan), dan Impacting (cara memengaruhi). Klaster dengan bakat berperingkat tinggi paling banyak = klaster paling menonjol.</p>
+      <div class="compass" id="compass"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-label">03</div>
+      <div class="section-title">Fungsi yang Sesuai Bakat Dominan</div>
+      <p style="font-size:13px;color:var(--ink-soft);margin-top:-6px;">Peran/fungsi berikut diturunkan dari kombinasi bakat dominanmu, diurutkan dari yang paling relevan.</p>
+      <div id="func-list"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-label">04</div>
+      <div class="section-title">Peta Kekuatan (Strength Cluster Map)</div>
+      <p style="font-size:13px;color:var(--ink-soft);margin-top:-6px;">Menunjukkan seberapa kuat masing-masing klaster memengaruhi karaktermu secara keseluruhan.</p>
+      <div id="cluster-list"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-label">05</div>
+      <div class="section-title">Tipologi Kekuatan (Personal Branding)</div>
+      <p style="font-size:13px;color:var(--ink-soft);margin-top:-6px;">5 tipologi teratas berikut adalah gambaran "merek pribadi" (personal brand) berdasarkan pola bakat dominanmu.</p>
+      <div id="typo-list"></div>
+    </div>
+
+    <div class="footnote">
+      Prototipe ini disederhanakan dari kerangka Talents Mapping untuk kebutuhan sekolah (16 tema bakat, bukan 34), dan ditujukan sebagai alat pengenalan diri (self-awareness) non-klinis. Disarankan hasil didiskusikan bersama guru BK.
+    </div>
+    <button class="restart-btn" onclick="location.reload()">Ulangi Asesmen</button>
+  </div>
+
+</div>
+
+<script>
+/* ============ DATA ============ */
+const GROUP_LABELS = {
+  striving:'Striving — Daya Juang',
+  thinking:'Thinking — Cara Berpikir',
+  relating:'Relating — Membangun Hubungan',
+  impacting:'Impacting — Memengaruhi Orang Lain'
+};
+const GROUP_COLORS = {
+  striving:'#B98900',
+  thinking:'#1F7A6C',
+  relating:'#5B7FB5',
+  impacting:'#A0466B'
+};
+
+const THEMES = [
+  {id:'achiever', name:'Achiever', group:'striving', desc:'Bekerja keras dan gigih mengejar pencapaian.', items:[
+    'Saya selalu ingin menyelesaikan lebih banyak tugas dalam sehari.',
+    'Saya merasa tidak puas jika hanya mengerjakan sedikit hal.',
+    'Saya bekerja keras walau tanpa ada yang menyuruh.']},
+  {id:'activator', name:'Activator', group:'striving', desc:'Mengubah ide menjadi tindakan dengan cepat.', items:[
+    'Saya lebih suka langsung mencoba daripada terlalu lama merencanakan.',
+    'Saya tidak sabar untuk segera memulai sesuatu yang baru.',
+    'Saya berani mengambil tindakan meski informasi belum lengkap.']},
+  {id:'belief', name:'Belief', group:'striving', desc:'Memegang nilai-nilai yang memandu tindakan.', items:[
+    'Saya senang membantu orang lain tanpa mengharapkan imbalan.',
+    'Nilai-nilai yang saya yakini memengaruhi semua keputusan saya.',
+    'Saya merasa hidup harus bermanfaat bagi orang banyak.']},
+  {id:'focus', name:'Focus', group:'striving', desc:'Menetapkan tujuan jelas dan konsisten mengejarnya.', items:[
+    'Saya selalu punya target yang jelas sebelum memulai sesuatu.',
+    'Saya merasa terganggu jika tidak memiliki tujuan yang pasti.',
+    'Saya senang membuat rencana dan mengejar pencapaiannya.']},
+  {id:'analytical', name:'Analytical', group:'thinking', desc:'Mencari data dan alasan logis di balik sesuatu.', items:[
+    'Saya suka mencari alasan logis di balik suatu kejadian.',
+    'Saya butuh bukti atau data sebelum saya percaya sesuatu.',
+    'Saya senang menganalisis pola dari suatu masalah.']},
+  {id:'strategic', name:'Strategic', group:'thinking', desc:'Melihat pola dan menemukan jalan terbaik.', items:[
+    'Saya bisa melihat beberapa cara berbeda untuk mencapai satu tujuan.',
+    'Saya cepat menemukan pola di tengah situasi yang rumit.',
+    'Saya suka memikirkan langkah-langkah terbaik sebelum bertindak.']},
+  {id:'learner', name:'Learner', group:'thinking', desc:'Senang pada proses mempelajari hal baru.', items:[
+    'Saya senang mempelajari hal baru, apapun topiknya.',
+    'Proses belajar itu sendiri membuat saya bersemangat.',
+    'Saya cepat bosan jika tidak ada hal baru untuk dipelajari.']},
+  {id:'deliberative', name:'Deliberative', group:'thinking', desc:'Berhati-hati dan waspada sebelum bertindak.', items:[
+    'Saya berhati-hati sebelum mengambil keputusan penting.',
+    'Saya suka mempertimbangkan risiko sebelum bertindak.',
+    'Saya memilih teman dekat dengan sangat selektif.']},
+  {id:'empathy', name:'Empathy', group:'relating', desc:'Merasakan apa yang dirasakan orang lain.', items:[
+    'Saya bisa merasakan apa yang dirasakan orang lain.',
+    'Saya peka terhadap suasana hati orang di sekitar saya.',
+    'Saya sering diminta menjadi tempat curhat teman-teman.']},
+  {id:'harmony', name:'Harmony', group:'relating', desc:'Menghindari konflik dan mencari titik temu.', items:[
+    'Saya tidak suka konflik dan berusaha menghindarinya.',
+    'Saya berusaha mencari titik temu saat ada perbedaan pendapat.',
+    'Saya lebih suka bekerja sama daripada berdebat.']},
+  {id:'relator', name:'Relator', group:'relating', desc:'Menikmati hubungan dekat dan mendalam.', items:[
+    'Saya lebih nyaman memiliki sedikit teman dekat daripada banyak kenalan.',
+    'Saya senang menjalin hubungan yang mendalam dengan orang lain.',
+    'Saya suka mengenal sisi pribadi dari teman-teman saya.']},
+  {id:'includer', name:'Includer', group:'relating', desc:'Berusaha membuat semua orang merasa diterima.', items:[
+    'Saya berusaha mengajak semua orang untuk merasa diterima dalam kelompok.',
+    'Saya tidak suka melihat ada teman yang dikucilkan.',
+    'Saya senang saat semua orang merasa menjadi bagian dari tim.']},
+  {id:'communication', name:'Communication', group:'impacting', desc:'Mudah menjelaskan gagasan dengan menarik.', items:[
+    'Saya senang bercerita atau menjelaskan sesuatu di depan orang lain.',
+    'Saya bisa membuat topik biasa menjadi menarik saat disampaikan.',
+    'Saya percaya diri saat berbicara di depan umum.']},
+  {id:'command', name:'Command', group:'impacting', desc:'Berani mengambil alih dan menghadapi konfrontasi.', items:[
+    'Saya berani menyampaikan pendapat walau berbeda dari orang lain.',
+    'Saya cenderung mengambil alih situasi saat keadaan tidak menentu.',
+    'Saya tidak takut menghadapi konfrontasi jika diperlukan.']},
+  {id:'woo', name:'Woo (Winning Others Over)', group:'impacting', desc:'Senang berkenalan dan meyakinkan orang baru.', items:[
+    'Saya senang bertemu dan berkenalan dengan orang baru.',
+    'Saya mudah akrab dengan orang yang baru saya kenal.',
+    'Saya suka tantangan untuk meyakinkan orang lain.']},
+  {id:'developer', name:'Developer', group:'impacting', desc:'Senang menumbuhkan potensi orang lain.', items:[
+    'Saya senang melihat teman saya berkembang dan semakin maju.',
+    'Saya suka membantu orang lain menemukan potensi dirinya.',
+    'Saya merasa puas saat bisa mendorong orang lain mencapai sesuatu.']},
+];
+
+// build flat question list
+const QUESTIONS = [];
+THEMES.forEach(t=>{
+  t.items.forEach(stmt=>QUESTIONS.push({themeId:t.id, text:stmt}));
+});
+
+const SCALE = [
+  {v:1,label:'Sangat Tidak Sesuai'},
+  {v:2,label:'Tidak Sesuai'},
+  {v:3,label:'Netral'},
+  {v:4,label:'Sesuai'},
+  {v:5,label:'Sangat Sesuai'}
+];
+
+const FUNCTIONS = [
+  {name:'Manajerial & Kepemimpinan', desc:'Merencanakan, mengorganisir, dan menggerakkan orang lain untuk mencapai target.', themes:['command','achiever','focus','activator']},
+  {name:'Perencana Strategis', desc:'Menyusun langkah dan alternatif solusi jangka panjang.', themes:['strategic','deliberative','focus']},
+  {name:'Fasilitator & Penengah', desc:'Menjaga kekompakan tim dan menjembatani perbedaan.', themes:['harmony','includer','relator']},
+  {name:'Peneliti / Analis', desc:'Meneliti, mengolah data, dan mencari pola di balik masalah.', themes:['analytical','learner','deliberative']},
+  {name:'Pendidik & Pengembang Orang Lain', desc:'Mengajar, melatih, dan menumbuhkan potensi orang lain.', themes:['developer','learner','communication']},
+  {name:'Pendamping / Konselor', desc:'Mendengarkan dan memberi dukungan emosional pada orang lain.', themes:['empathy','harmony','belief']},
+  {name:'Komunikator / Duta', desc:'Menjelaskan gagasan dan membangun jejaring dengan orang baru.', themes:['communication','woo','command']},
+  {name:'Inisiator Perubahan', desc:'Memulai hal baru dan bergerak cepat mengubah ide menjadi aksi.', themes:['activator','achiever','strategic']},
+];
+
+const TYPOLOGIES = [
+  {name:'Sang Penggerak (The Driver)', desc:'Berorientasi hasil, tegas, dan cepat bertindak.', themes:['achiever','focus','command']},
+  {name:'Sang Penganalisis (The Analyst)', desc:'Teliti, berpikir logis, dan berbasis data.', themes:['analytical','deliberative','learner']},
+  {name:'Sang Pemerhati (The Caregiver)', desc:'Empatik, hangat, dan berpegang pada nilai.', themes:['empathy','harmony','belief']},
+  {name:'Sang Komunikator (The Communicator)', desc:'Percaya diri berbicara dan berani menyatakan pendapat.', themes:['communication','woo','command']},
+  {name:'Sang Pembimbing Strategis (Strategist-Mentor)', desc:'Visioner sekaligus suka menumbuhkan orang lain.', themes:['strategic','developer','belief']},
+  {name:'Sang Penghubung (The Connector)', desc:'Merangkul semua pihak dan menjaga kekompakan.', themes:['includer','harmony','relator']},
+  {name:'Sang Perintis (The Initiator)', desc:'Berani memulai hal baru dan bergerak cepat.', themes:['activator','achiever','strategic']},
+  {name:'Sang Pendidik (The Educator)', desc:'Senang mengajar dan membantu orang lain bertumbuh.', themes:['developer','learner','empathy']},
+];
+
+/* ============ EXPORT / PDF ============ */
+function exportReport(){
+  const name = document.getElementById('stu-name').value.trim();
+  const kelas = document.getElementById('stu-class').value.trim();
+
+  if(!name){
+    alert('Mohon isi nama siswa terlebih dahulu sebelum mengunduh laporan.');
+    document.getElementById('stu-name').focus();
+    return;
+  }
+
+  // fill in report header info
+  document.getElementById('print-date').textContent = new Date().toLocaleDateString('id-ID', {
+    day:'numeric', month:'long', year:'numeric'
+  });
+
+  const oldTitle = document.title;
+  document.title = 'Laporan Peta Bakat - ' + name + (kelas ? ' - ' + kelas : '');
+  document.getElementById('report-student-line').textContent =
+    'Nama: ' + name + (kelas ? '   |   Kelas: ' + kelas : '');
+
+  window.print();
+
+  document.title = oldTitle;
+}
+
+/* ============ STATE ============ */
+let current = 0;
+const answers = new Array(QUESTIONS.length).fill(null);
+
+function startQuiz(){
+  document.getElementById('screen-intro').classList.add('hidden');
+  document.getElementById('screen-quiz').classList.remove('hidden');
+  renderQuestion();
+}
+
+function renderQuestion(){
+  const q = QUESTIONS[current];
+  document.getElementById('q-number').textContent = 'ITEM ' + String(current+1).padStart(2,'0');
+  document.getElementById('q-text').textContent = q.text;
+  document.getElementById('progress-label').textContent = `Pertanyaan ${current+1} dari ${QUESTIONS.length}`;
+  document.getElementById('progress-fill').style.width = ((current)/QUESTIONS.length*100) + '%';
+
+  const scaleDiv = document.getElementById('scale-buttons');
+  scaleDiv.innerHTML = '';
+  SCALE.forEach(s=>{
+    const btn = document.createElement('button');
+    btn.textContent = s.v + ' — ' + s.label;
+    if(answers[current] === s.v) btn.classList.add('selected');
+    btn.onclick = ()=>{
+      answers[current] = s.v;
+      renderQuestion();
+    };
+    scaleDiv.appendChild(btn);
+  });
+
+  document.getElementById('btn-prev').disabled = current === 0;
+  const nextBtn = document.getElementById('btn-next');
+  nextBtn.disabled = answers[current] === null;
+  nextBtn.textContent = current === QUESTIONS.length-1 ? 'Lihat Hasil →' : 'Selanjutnya →';
+}
+
+function nextQ(){
+  if(answers[current] === null) return;
+  if(current === QUESTIONS.length-1){
+    computeResults();
+    return;
+  }
+  current++;
+  renderQuestion();
+}
+function prevQ(){
+  if(current===0) return;
+  current--;
+  renderQuestion();
+}
+
+/* ============ SCORING ============ */
+function computeResults(){
+  document.getElementById('screen-quiz').classList.add('hidden');
+  document.getElementById('screen-results').classList.remove('hidden');
+
+  // score per theme
+  const themeScores = THEMES.map(t=>{
+    const idxs = [];
+    QUESTIONS.forEach((q,i)=>{ if(q.themeId===t.id) idxs.push(i); });
+    const sum = idxs.reduce((acc,i)=>acc+answers[i],0);
+    return {...t, score:sum, max: idxs.length*5};
+  });
+
+  themeScores.sort((a,b)=>b.score-a.score);
+  themeScores.forEach((t,i)=>{ t.rank = i+1; t.weight = THEMES.length - i; }); // weight: rank1=16 ... rank16=1
+
+  renderRankList(themeScores);
+  renderCompass(themeScores);
+  renderFunctions(themeScores);
+  renderClusterMap(themeScores);
+  renderTypology(themeScores);
+}
+
+function tierClass(rank){
+  if(rank<=4) return 'tier1';
+  if(rank<=8) return 'tier2';
+  if(rank<=12) return 'tier3';
+  return 'tier4';
+}
+
+function renderRankList(themeScores){
+  const el = document.getElementById('rank-list');
+  el.innerHTML = '';
+  const maxScore = Math.max(...themeScores.map(t=>t.score));
+  themeScores.forEach(t=>{
+    const row = document.createElement('div');
+    row.className = 'rank-row ' + tierClass(t.rank);
+    row.innerHTML = `
+      <div class="rank-num">${t.rank}</div>
+      <div class="rank-name">${t.name}</div>
+      <div class="rank-bar-track"><div class="rank-bar-fill" style="width:${(t.score/maxScore*100).toFixed(0)}%"></div></div>
+      <div class="rank-group">${t.group}</div>
+    `;
+    el.appendChild(row);
+  });
+}
+
+function renderCompass(themeScores){
+  const el = document.getElementById('compass');
+  el.innerHTML = '';
+  ['striving','thinking','relating','impacting'].forEach(g=>{
+    const groupThemes = themeScores.filter(t=>t.group===g).sort((a,b)=>a.rank-b.rank);
+    const quad = document.createElement('div');
+    quad.className = 'quad';
+    let inner = `<h3 style="color:${GROUP_COLORS[g]};border-color:${GROUP_COLORS[g]}33">${GROUP_LABELS[g]}</h3>`;
+    groupThemes.forEach(t=>{
+      inner += `<div class="quad-theme" style="background:${tierBg(t.rank)}">
+        <span class="quad-theme-name"><span class="dot" style="background:${GROUP_COLORS[g]}"></span>${t.name}</span>
+        <span style="font-size:11px;color:var(--ink-soft)">#${t.rank}</span>
+      </div>`;
+    });
+    quad.innerHTML = inner;
+    el.appendChild(quad);
+  });
+}
+function tierBg(rank){
+  if(rank<=4) return '#F0E0AE';
+  if(rank<=8) return '#F7EFD8';
+  if(rank<=12) return '#F0F2F6';
+  return 'transparent';
+}
+
+function renderFunctions(themeScores){
+  const scoreMap = {};
+  themeScores.forEach(t=> scoreMap[t.id] = t.weight);
+
+  const scored = FUNCTIONS.map(f=>{
+    const s = f.themes.reduce((acc,tid)=>acc + (scoreMap[tid]||0), 0);
+    return {...f, score:s};
+  }).sort((a,b)=>b.score-a.score);
+
+  const el = document.getElementById('func-list');
+  el.innerHTML = '';
+  scored.slice(0,6).forEach((f,i)=>{
+    const item = document.createElement('div');
+    item.className = 'func-item';
+    item.innerHTML = `
+      <div class="func-rank">${i+1}</div>
+      <div class="func-body">
+        <h4>${f.name}</h4>
+        <p>${f.desc}</p>
+      </div>
+    `;
+    el.appendChild(item);
+  });
+}
+
+function renderClusterMap(themeScores){
+  const totals = {striving:0,thinking:0,relating:0,impacting:0};
+  const maxTotals = {striving:0,thinking:0,relating:0,impacting:0};
+  themeScores.forEach(t=>{ totals[t.group]+=t.score; maxTotals[t.group]+=t.max; });
+
+  const el = document.getElementById('cluster-list');
+  el.innerHTML = '';
+  Object.keys(totals).sort((a,b)=>totals[b]-totals[a]).forEach(g=>{
+    const pct = (totals[g]/maxTotals[g]*100).toFixed(0);
+    const row = document.createElement('div');
+    row.className = 'cluster-row';
+    row.innerHTML = `
+      <div class="cluster-head"><strong>${GROUP_LABELS[g]}</strong><span>${pct}%</span></div>
+      <div class="cluster-track"><div class="cluster-fill" style="width:${pct}%;background:${GROUP_COLORS[g]}"></div></div>
+    `;
+    el.appendChild(row);
+  });
+}
+
+function renderTypology(themeScores){
+  const scoreMap = {};
+  themeScores.forEach(t=> scoreMap[t.id] = t.weight);
+
+  const scored = TYPOLOGIES.map(ty=>{
+    const s = ty.themes.reduce((acc,tid)=>acc + (scoreMap[tid]||0), 0);
+    return {...ty, score:s};
+  }).sort((a,b)=>b.score-a.score);
+
+  const el = document.getElementById('typo-list');
+  el.innerHTML = '';
+  scored.forEach((ty,i)=>{
+    const card = document.createElement('div');
+    card.className = 'typo-card' + (i<5 ? ' top' : '');
+    card.innerHTML = `
+      <div>
+        <div class="typo-name">${ty.name}</div>
+        <div class="typo-desc">${ty.desc}</div>
+      </div>
+      <div class="typo-rank">${i+1}</div>
+    `;
+    el.appendChild(card);
+  });
+}
+</script>
+</body>
+</html>
